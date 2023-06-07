@@ -1,36 +1,35 @@
 #include "lista.h"
-//ficheiro com as funções principais do programa(funcionalidades)
+
+void printAllReservations(lista* l1, lista* l2){
+    printf("---------------------------------------------------\n");
+    imprime_lista(l1);
+    imprime_lista(l2);
+    printf("---------------------------------------------------\n");
+}
+
 void cria_reserva(lista* l1, lista* l2, Data data_atual){
+    Intervalo interv;
     //pede-se o tipo de serviço(lavagem/manutenção)
-    int service;
     printf("Escolha um serviço: 1-Lavagem(meia hora) 2-Manutencao(uma hora) ");
-    inputUmDigito(&service, '1', '2');
+    inputUmDigito(&interv.serviço, '1', '2');
     //pede-se a data inicial do serviço
-    Data inicial;
     printf("Dia:(DD/MM/AAAA) ");
-    diaValido(&inicial.dia,&inicial.mes,&inicial.ano);
+    diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
     printf("Horas:(HH:MM) ");
-    horaValida(&inicial.horas, &inicial.minutos);
+    horaValida(&interv.h_inicial.horas, &interv.h_inicial.minutos);
     //verificamos se a data introduzida para a reserva é maior que a atual
-    while(data_maior(data_atual,inicial)){
+    while(compare_date(data_atual,interv.h_inicial) == 1){
         printf("Não podes fazer uma reserva para o passado :)\n");
         printf("Dia:(DD/MM/AAAA) ");
-        diaValido(&inicial.dia,&inicial.mes,&inicial.ano);
+        diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
         printf("Horas:(HH:MM) ");
-        horaValida(&inicial.horas, &inicial.minutos);
+        horaValida(&interv.h_inicial.horas, &interv.h_inicial.minutos);
     }
     //calcula-se a data final com base na data inicial e no serviço
-    Data final = soma_data(inicial,service);
+    interv.h_final = soma_data(interv.h_inicial,interv.serviço);
     //pede-se o número do cc
-    int n_cc;
     printf("Número de Cartão de Cidadão: ");
-    ccValido(&n_cc);
-    //agrupa-se a informação toda numa variável intervalo
-    Intervalo interv;
-    interv.cc = n_cc; 
-    interv.serviço = service;
-    interv.h_inicial = inicial;
-    interv.h_final = final;
+    ccValido(&interv.cc);
     //verifica-se a disponibilidade consoante a data que o cliente inseriu
     int disponibilidade = data_in_lista(l1, interv);
     if(disponibilidade == 0){
@@ -44,10 +43,7 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
         interv.id = disponibilidade;
         insere_lista2(l2,interv);
     }
-    printf("----------------------------\n");
-    imprime_lista(l1);
-    imprime_lista(l2); 
-    printf("----------------------------\n");
+    printAllReservations(l1,l2);
 }
 
 void cancela_reserva(lista* l1, lista* l2){
@@ -67,13 +63,9 @@ void cancela_reserva(lista* l1, lista* l2){
         //se encontrarmos retira-se e insere-se as pre-reservas que fiquem com disponibilidade
         if(intervalo_igual(atual->valor,cancela) && atual->valor.cc == cancela.cc){
             retira_intervalo(l1,cancela);
-            if(l2->inicio != NULL){
-                for(int i=0; i<2; i++) passa_preReservas_livres(l1,l2);
-            }
-            printf("----------------------------\n");
-            imprime_lista(l1);
-            imprime_lista(l2);
-            printf("----------------------------\n");
+            if(l2->inicio != NULL) passa_preReservas_livres(l1,l2);
+            if(l2->inicio != NULL) passa_preReservas_livres(l1,l2);
+            printAllReservations(l1,l2);
             return;
         }
     }
@@ -81,10 +73,7 @@ void cancela_reserva(lista* l1, lista* l2){
     for(no *atual = l2->inicio; atual!=NULL; atual=atual->prox){
         if(intervalo_igual(atual->valor,cancela) && atual->valor.cc == cancela.cc){
             retira_intervalo(l2,cancela);
-            printf("----------------------------\n");
-            imprime_lista(l1);
-            imprime_lista(l2);
-            printf("----------------------------\n");
+            printAllReservations(l1,l2);
             return;
         }
     }
@@ -153,10 +142,7 @@ void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
                                                                  atual->valor.serviço, atual->valor.cc, atual->valor.id);
     }
     fclose(f);
-    printf("----------------------------\n");
-    imprime_lista(l1);
-    imprime_lista(l2);
-    printf("----------------------------\n");
+    printAllReservations(l1,l2);
 }
 
 void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
@@ -207,10 +193,7 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
         }
     }
     fclose(f);
-    printf("----------------------------\n");
-    imprime_lista(l1);
-    imprime_lista(l2);
-    printf("----------------------------\n");
+    printAllReservations(l1,l2);
 }
 
 void avancar_tempo(lista* l1, lista* l2, Data* d){
@@ -221,7 +204,7 @@ void avancar_tempo(lista* l1, lista* l2, Data* d){
         diaValido(&(d->dia), &(d->mes), &(d->ano));
         printf("Para que horas pretende avançar?:(HH:MM) ");
         horaValida(&(d->horas), &(d->minutos));
-        if(data_maior(*d, aux) == 1){
+        if(compare_date(*d, aux) == 1){
             break;
         } else{
             printf("Não podes avançar para uma data menor que a atual\n");
@@ -232,7 +215,7 @@ void avancar_tempo(lista* l1, lista* l2, Data* d){
     no* proximo;
     while(atual != NULL){
         proximo = atual->prox;
-        if(data_maior(*d,atual->valor.h_inicial)){
+        if(compare_date(*d,atual->valor.h_final) == 1 || compare_date(*d,atual->valor.h_final) == -1){
             retira_intervalo(l1, atual->valor);
         }
         atual = proximo;
@@ -241,13 +224,10 @@ void avancar_tempo(lista* l1, lista* l2, Data* d){
     atual = l2->inicio;
     while(atual != NULL){
         proximo = atual->prox;
-        if(data_maior(*d,atual->valor.h_inicial)){
+        if(compare_date(*d,atual->valor.h_final) == 1 || compare_date(*d,atual->valor.h_final) == -1){
             retira_intervalo(l2, atual->valor);
         }
         atual = proximo;
     }
-    printf("----------------------------\n");
-    imprime_lista(l1);
-    imprime_lista(l2);
-    printf("----------------------------\n");
+    printAllReservations(l1,l2);
 }

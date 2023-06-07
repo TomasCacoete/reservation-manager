@@ -12,11 +12,11 @@ int main(){
     Data dia_hora_atual  = {2023,5,22,8,0};
     //menu com um switch que possui cada opção do programa
     int option = -1;
-    while(option != 7){
+    while(option != 8){
         printf("Menu - Data Atual: %02d:%02d %02d/%02d/%d\n", dia_hora_atual.horas, dia_hora_atual.minutos, dia_hora_atual.dia, dia_hora_atual.mes, dia_hora_atual.ano);
-        printf("[1]-Criar uma nova reserva\n[2]-Cancelar uma reserva\n[3]-Mostrar reservas do cliente\n[4]-Guardar informação atual no ficheiro\n[5]-Carregar informação do ficheiro\n[6]-Avançar tempo\n[7]-Sair\n");
+        printf("[1]-Criar uma nova reserva\n[2]-Cancelar uma reserva\n[3]-Mostrar reservas do cliente\n[4]-Mostrar todas as reservas\n[5]-Guardar informação atual no ficheiro\n[6]-Carregar informação do ficheiro\n[7]-Avançar tempo\n[8]-Sair\n");
         printf("Selecione uma opção: ");
-        inputUmDigito(&option, '0', '7');
+        inputUmDigito(&option, '0', '8');
         
         switch(option){
             case 1:
@@ -29,12 +29,15 @@ int main(){
                 imprime_reservas_cliente(l1,l2);
                 break;
             case 4:
-                guarda_informacao_ficheiro(l1,l2,dia_hora_atual);
+                printAllReservations(l1,l2);
                 break;
             case 5:
-                carrega_informacao_ficheiro(l1,l2,&dia_hora_atual);
+                guarda_informacao_ficheiro(l1,l2,dia_hora_atual);
                 break;
             case 6:
+                carrega_informacao_ficheiro(l1,l2,&dia_hora_atual);
+                break;
+            case 7:
                 avancar_tempo(l1,l2,&dia_hora_atual);
                 break;
         }
@@ -47,3 +50,17 @@ int main(){
 
 //gcc *.c -o main -g
 //valgrind --track-origins=yes ./main
+
+
+//problemas
+
+//a listagem dos clientes tá lixada nas pré-reservas porque a ordem n é necessariamente cronológica
+//dá para fazer uma manutenção para as 17:30
+//mudar a maneira de como se atribui um id único à lista, o atual não é eficiente
+
+//o sistema de prioridade pode mudar para o seguinte
+//percorremos a lista de pre-reservas sempre a ver se cada uma tem disponibilidade
+//caso tenha guardamos num aux, caso não passamos em frente
+//continuamos a percorrer a lista. se encontrar mos mais um com disponibilidade então vamos verificar se o aux e este novo coincidem
+//se coincidirem, avaliamos a prioridade e o aux passa a ser o que tiver a prioridade mais baixa
+//se não coincidirem adiciona-se o aux

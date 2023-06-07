@@ -49,11 +49,11 @@ void horaValida(int* horas, int* minutos){
             //evita que o usuário escreva mais do que 1 ":"
             } else if(input[i] == ':'){
                 n_doispontos++;
-                if(n_doispontos > 1){
-                    printf("Input inválido - Garanta que está a utilizar o formato (HH:MM)\n");
-                    flag = 1;
-                }
             }
+        }
+        if(n_doispontos != 1){
+            printf("Input inválido - Garanta que está a utilizar o formato (HH:MM)\n");
+            flag = 1;
         }
         if(flag) continue;
 
@@ -88,11 +88,6 @@ void diaValido(int* dia, int* mes, int* ano){
                 break;
             } else if(input[i] == '/'){
                 n_barra++;
-                if(n_barra > 2){
-                    printf("Input inválido - Garanta que está a utilizar o formato (DD/MM/AAAA)\n");
-                    flag = 1;
-                    break;
-                }
             }
             //evita que o usuário coloque duas barras seguidas
             if(input[i] == '/' && input[i+1] == '/'){
@@ -101,11 +96,18 @@ void diaValido(int* dia, int* mes, int* ano){
                 break;
             }
         }
+        if(n_barra != 2){
+            printf("Input inválido - Garanta que está a utilizar o formato (DD/MM/AAAA)\n");
+            flag = 1;
+        }
         if(flag) continue;
         
         sscanf(input,"%d/%d/%d",dia,mes,ano);
         //evita que o usuário coloque um dia que não existe
         if(*dia < 1 || *dia > 31 || *mes < 1 || *mes > 12 || *ano < 1){
+            printf("Input inválido\n");
+            continue;
+        } else if((*mes == 2 && *dia > 28) || (*mes == 4 && *dia > 30) || (*mes == 6 && *dia > 30) || (*mes == 9 && *dia > 30) || (*mes == 11 && *dia > 30)){
             printf("Input inválido\n");
             continue;
         } else{

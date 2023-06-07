@@ -17,14 +17,14 @@ no* insere_lista(lista* l, Intervalo interv){
 
     if(l->inicio == NULL){
         l->inicio = aux;
-    } else if(data_maior(l->inicio->valor.h_final,interv.h_inicial)){
+    } else if(compare_date(l->inicio->valor.h_final,interv.h_inicial) == 1){
         aux->prox = l->inicio;
         l->inicio->prev = aux;
         l->inicio = aux;
     } else{
         no* ant = l->inicio;
         no* atual = l->inicio->prox;
-        while(atual != NULL && !data_maior(atual->valor.h_final, interv.h_inicial)){
+        while(atual != NULL && compare_date(atual->valor.h_final, interv.h_inicial) == 0){
             ant = atual;
             atual = atual->prox;
         }
@@ -46,14 +46,14 @@ no* insere_lista2(lista* l, Intervalo interv){
 
     if(l->inicio == NULL){
         l->inicio = aux;
-    } else if(l->inicio->valor.id == interv.id || (l->inicio->valor.id != interv.id && data_maior(l->inicio->valor.h_final,interv.h_inicial))){
+    } else if(l->inicio->valor.id == interv.id || (l->inicio->valor.id != interv.id && compare_date(l->inicio->valor.h_final,interv.h_inicial) == 1)){
         aux->prox = l->inicio;
         l->inicio->prev = aux;
         l->inicio = aux;
     } else{
         no* ant = l->inicio;
         no* atual = l->inicio->prox;
-        while(atual != NULL && !data_maior(atual->valor.h_final, interv.h_inicial) && atual->valor.id != interv.id){
+        while(atual != NULL && compare_date(atual->valor.h_final, interv.h_inicial) == 0 && atual->valor.id != interv.id){
             ant = atual;
             atual = atual->prox;
         }
@@ -126,8 +126,8 @@ int tamanho_lista(lista* l){
 void imprime_lista(lista *l){
     if (l->inicio!=NULL){
         for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
-            //printf("%d ", atual->valor.id);
-            //printf("%d ", atual->valor.cc);
+            printf("%d ", atual->valor.id);
+            printf("%d ", atual->valor.cc);
             printf("%02d/%02d/%02d ",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano);
             printf("(%02d:%02d-%02d:%02d)-> ",atual->valor.h_inicial.horas,
                                              atual->valor.h_inicial.minutos,
@@ -146,7 +146,6 @@ void passa_preReservas_livres(lista* l1,lista* l2){
     while(atual != NULL){
         //guardamos o id atual
         id_aux = atual->valor.id;
-        printf("%d %d\n", atual->valor.cc, data_in_lista(l1, atual->valor));
         while(atual != NULL && id_aux == atual->valor.id){
             if(data_in_lista(l1, atual->valor) == 0){
                 sub = atual->valor;

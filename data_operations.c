@@ -1,14 +1,6 @@
 #include "lista.h"
 
-int data_igual(Data d1, Data d2){
-    return d1.ano == d2.ano
-        && d1.mes == d2.mes
-        && d1.dia == d2.dia
-        && d1.horas == d2.horas 
-        && d1.minutos == d2.minutos;
-}
-
-int data_maior(Data d1, Data d2){
+int compare_date(Data d1, Data d2){
     if (d1.ano > d2.ano) return 1;
     else if (d1.ano < d2.ano) return 0;
     else if (d1.mes > d2.mes) return 1;
@@ -18,11 +10,12 @@ int data_maior(Data d1, Data d2){
     else if (d1.horas > d2.horas) return 1;
     else if (d1.horas < d2.horas) return 0;
     else if (d1.minutos > d2.minutos) return 1;
-    else return 0;
+    else if (d1.minutos < d2.minutos) return 0;
+    else return -1;
 }
 //intervalos iguais se as datas iniciais e finais forem iguais
 int intervalo_igual(Intervalo i1, Intervalo i2){
-    return data_igual(i1.h_inicial,i2.h_inicial) && data_igual(i1.h_final,i2.h_final);
+    return compare_date(i1.h_inicial,i2.h_inicial) == -1 && compare_date(i1.h_final,i2.h_final) == -1;
 }
 //função utilizada para calcular a hora final com base no serviço
 Data soma_data(Data d, int service){
@@ -52,10 +45,10 @@ Data soma_data(Data d, int service){
 }
 
 int data_in_intervalo(Intervalo quer_entrar, Intervalo ja_feito){
-    if(ja_feito.serviço == 2) return data_igual(quer_entrar.h_final, soma_data(ja_feito.h_inicial,1))
-                                  || data_igual(quer_entrar.h_inicial, soma_data(ja_feito.h_inicial,1));
-    else return data_igual(quer_entrar.h_final, ja_feito.h_final)
-             || data_igual(quer_entrar.h_inicial, ja_feito.h_inicial);
+    if(ja_feito.serviço == 2) return compare_date(quer_entrar.h_final, soma_data(ja_feito.h_inicial,1)) == -1
+                                  || compare_date(quer_entrar.h_inicial, soma_data(ja_feito.h_inicial,1)) == -1;
+    else return compare_date(quer_entrar.h_final, ja_feito.h_final) == -1
+             || compare_date(quer_entrar.h_inicial, ja_feito.h_inicial) == -1;
 }
 
 int data_in_lista(lista* l, Intervalo i){
