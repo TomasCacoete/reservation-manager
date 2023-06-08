@@ -34,14 +34,11 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
     int disponibilidade = data_in_lista(l1, interv);
     if(disponibilidade == 0){
         //caso haja, encontra-se um id único e insere-se na lista das reservas
-        interv.id = interv.cc;
-        while(id_in_lista(l1, interv)) interv.id++;
         insere_lista(l1,interv);
     }
     else{
         //caso não haja então assume-se o id da reserva que está a interferir e coloca-se na lista das pre-reservas
-        interv.id = disponibilidade;
-        insere_lista2(l2,interv);
+        insere_lista(l2,interv);
     }
     printAllReservations(l1,l2);
 }
@@ -63,7 +60,6 @@ void cancela_reserva(lista* l1, lista* l2){
         //se encontrarmos retira-se e insere-se as pre-reservas que fiquem com disponibilidade
         if(intervalo_igual(atual->valor,cancela) && atual->valor.cc == cancela.cc){
             retira_intervalo(l1,cancela);
-            if(l2->inicio != NULL) passa_preReservas_livres(l1,l2);
             if(l2->inicio != NULL) passa_preReservas_livres(l1,l2);
             printAllReservations(l1,l2);
             return;
@@ -90,7 +86,6 @@ void imprime_reservas_cliente(lista* l1, lista* l2){
     while(aux != NULL && aux->prox != NULL) aux = aux->prox;
     while(aux != NULL){
         if(aux->valor.cc == n_cc){
-            printf("%d ", aux->valor.id);
             printf("%d ", aux->valor.cc);
             printf("%02d/%02d/%02d ",aux->valor.h_inicial.dia,aux->valor.h_inicial.mes,aux->valor.h_inicial.ano);
             printf("(%02d:%02d-%02d:%02d)-> ",aux->valor.h_inicial.horas,
@@ -106,7 +101,6 @@ void imprime_reservas_cliente(lista* l1, lista* l2){
     while(aux != NULL && aux->prox != NULL) aux = aux->prox;
     while(aux != NULL){
         if(aux->valor.cc == n_cc){
-            printf("%d ", aux->valor.id);
             printf("%d ", aux->valor.cc);
             printf("%02d/%02d/%02d ",aux->valor.h_inicial.dia,aux->valor.h_inicial.mes,aux->valor.h_inicial.ano);
             printf("(%02d:%02d-%02d:%02d)-> ",aux->valor.h_inicial.horas,
@@ -129,17 +123,17 @@ void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
     //guarda-se informação sobre a data
     fprintf(f, "%02d:%02d %02d/%02d/%d\n", d.horas, d.minutos, d.dia, d.mes, d.ano);
     //guarda-se o tamanho da lista das reservas e das pre-reservas
-    fprintf(f, "%d %d\n", tamanho_lista(l1), tamanho_lista(l2));
+    fprintf(f, "%d %d %d %d\n", tamanho_lista(l1), tamanho_lista(l2), l1->q_priority, l2->q_priority);
     //guarda-se a informação de cada reserva e pre-reserva
     for(no *atual = l1->inicio; atual!=NULL; atual=atual->prox){
         fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
                                                                  atual->valor.h_inicial.horas, atual->valor.h_inicial.minutos, atual->valor.h_final.horas, atual->valor.h_final.minutos,
-                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.id);
+                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.priority);
     }
     for(no *atual = l2->inicio; atual!=NULL; atual=atual->prox){
         fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
                                                                  atual->valor.h_inicial.horas, atual->valor.h_inicial.minutos, atual->valor.h_final.horas, atual->valor.h_final.minutos,
-                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.id);
+                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.priority);
     }
     fclose(f);
     printAllReservations(l1,l2);
@@ -166,7 +160,7 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
     fscanf(f, "%02d:%02d %02d/%02d/%d\n", &(d->horas), &(d->minutos), &(d->dia), &(d->mes), &(d->ano));
     //carrega-se a informação das linhas em que começam e acabam as pre-reservas
     int start, end;
-    fscanf(f, "%d %d", &start, &end);
+    fscanf(f, "%d %d %d %d", &start, &end, &(l1->q_priority), &(l2->q_priority));
     start++;
     end += start;
     //percorre-se as linhas do ficheiro, se o indice da linha for menor que o tamanho da l1 então adiciona-se às reservas, caso contrário adiciona-se às pré-reservas
@@ -176,20 +170,20 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
             fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
                                                                    &interv.h_inicial.horas, &interv.h_inicial.minutos,
                                                                    &interv.h_final.horas, &interv.h_final.minutos,
-                                                                   &interv.serviço, &interv.cc, &interv.id);
+                                                                   &interv.serviço, &interv.cc, &interv.priority);
             interv.h_final.ano = interv.h_inicial.ano;
             interv.h_final.mes = interv.h_inicial.mes;
             interv.h_final.dia = interv.h_inicial.dia;
-            insere_lista_fim(l1, interv);
+            insere_lista(l1, interv);
         } else{
             fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
                                                                    &interv.h_inicial.horas, &interv.h_inicial.minutos,
                                                                    &interv.h_final.horas, &interv.h_final.minutos,
-                                                                   &interv.serviço, &interv.cc, &interv.id);
+                                                                   &interv.serviço, &interv.cc, &interv.priority);
             interv.h_final.ano = interv.h_inicial.ano;
             interv.h_final.mes = interv.h_inicial.mes;
             interv.h_final.dia = interv.h_inicial.dia;
-            insere_lista_fim(l2, interv);
+            insere_lista(l2, interv);
         }
     }
     fclose(f);

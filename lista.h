@@ -17,8 +17,8 @@ typedef struct{
     Data h_inicial;
     Data h_final;
     int serviço;
-    int id;
     int cc;
+    int priority;
 } Intervalo;
 
 typedef struct no{
@@ -29,17 +29,15 @@ typedef struct no{
 
 typedef struct{
     no* inicio;
+    int q_priority;
 } lista;
 
 lista* cria_lista();
 no* insere_lista(lista* l, Intervalo interv);
-no* insere_lista2(lista* l, Intervalo interv);
-no* insere_lista_fim(lista* l, Intervalo interv);
 void destroi_lista(lista *l);
 void imprime_lista(lista *l);
 void retira_intervalo(lista *l,Intervalo interv);
 int tamanho_lista(lista* l);
-int id_in_lista(lista* l, Intervalo i);
 void passa_preReservas_livres(lista* l1,lista* l2);
 
 int intervalo_igual(Intervalo I1, Intervalo I2);

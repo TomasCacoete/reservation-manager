@@ -56,7 +56,7 @@ int main(){
 
 //a listagem dos clientes tá lixada nas pré-reservas porque a ordem n é necessariamente cronológica
 //dá para fazer uma manutenção para as 17:30
-//mudar a maneira de como se atribui um id único à lista, o atual não é eficiente
+//mudar a maneira como se ordenam os intervalos que têm interseção
 
 //o sistema de prioridade pode mudar para o seguinte
 //percorremos a lista de pre-reservas sempre a ver se cada uma tem disponibilidade

@@ -53,7 +53,7 @@ int data_in_intervalo(Intervalo quer_entrar, Intervalo ja_feito){
 
 int data_in_lista(lista* l, Intervalo i){
     for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
-        if(data_in_intervalo(i,atual->valor) || intervalo_igual(i,atual->valor)) return atual->valor.id;
+        if(data_in_intervalo(i,atual->valor) || intervalo_igual(i,atual->valor)) return 1;
     }
     return 0;
 }
