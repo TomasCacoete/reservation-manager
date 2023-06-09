@@ -10,7 +10,7 @@ lista* cria_lista(){
 }
 //função parecida à que usamos nas aulas que ordena os elementos verificando se o fim de uma reserva é antes do início da que queremos inserir
 //além disso também trabalha com ponteiros que apontam para o elemento anterior
-no* insere_lista(lista* l, Intervalo interv){
+/*no* insere_lista(lista* l, Intervalo interv){
     no* aux = malloc(sizeof(no));
     if(aux == NULL) return NULL;
 
@@ -23,14 +23,14 @@ no* insere_lista(lista* l, Intervalo interv){
 
     if(l->inicio == NULL){
         l->inicio = aux;
-    } else if(compare_date(l->inicio->valor.h_final,interv.h_inicial) == 1){
+    } else if(compare_date(l->inicio->valor.h_final,interv.h_final) == 1){
         aux->prox = l->inicio;
         l->inicio->prev = aux;
         l->inicio = aux;
     } else{
         no* ant = l->inicio;
         no* atual = l->inicio->prox;
-        while(atual != NULL && compare_date(atual->valor.h_final, interv.h_inicial) == 0){
+        while(atual != NULL && compare_date(atual->valor.h_final, interv.h_final) == 0){
             ant = atual;
             atual = atual->prox;
         }
@@ -40,7 +40,54 @@ no* insere_lista(lista* l, Intervalo interv){
         aux->prox = atual;
     }
     return aux;
+}*/
+
+no* insere_lista(lista* l, Intervalo interv) {
+    no* aux = malloc(sizeof(no));
+    if (aux == NULL)
+        return NULL;
+
+    l->q_priority += 1;
+    interv.priority = l->q_priority;
+
+    aux->valor = interv;
+    aux->prox = NULL;
+    aux->prev = NULL;
+
+    if (l->inicio == NULL) {
+        l->inicio = aux;
+    } else {
+        no* atual = l->inicio;
+        while (atual != NULL) {
+            if (compare_date(atual->valor.h_inicial, interv.h_inicial) == 1 ||
+                (compare_date(atual->valor.h_inicial, interv.h_inicial) == 0 &&
+                 compare_date(atual->valor.h_final, interv.h_final) == 1)) {
+                break;
+            }
+            atual = atual->prox;
+        }
+        if (atual == l->inicio) {
+            aux->prox = l->inicio;
+            l->inicio->prev = aux;
+            l->inicio = aux;
+        } else if (atual == NULL) {
+            no* last = l->inicio;
+            while (last->prox != NULL) {
+                last = last->prox;
+            }
+            last->prox = aux;
+            aux->prev = last;
+        } else {
+            aux->prox = atual;
+            aux->prev = atual->prev;
+            atual->prev->prox = aux;
+            atual->prev = aux;
+        }
+    }
+    return aux;
 }
+
+
 
 //função parecida à utilizada nas aulas, única diferença é a atualização dos ponteiros para trás
 void retira_intervalo(lista *l, Intervalo interv){

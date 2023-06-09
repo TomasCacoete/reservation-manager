@@ -54,13 +54,4 @@ int main(){
 
 //problemas
 
-//a listagem dos clientes tá lixada nas pré-reservas porque a ordem n é necessariamente cronológica
 //dá para fazer uma manutenção para as 17:30
-//mudar a maneira como se ordenam os intervalos que têm interseção
-
-//o sistema de prioridade pode mudar para o seguinte
-//percorremos a lista de pre-reservas sempre a ver se cada uma tem disponibilidade
-//caso tenha guardamos num aux, caso não passamos em frente
-//continuamos a percorrer a lista. se encontrar mos mais um com disponibilidade então vamos verificar se o aux e este novo coincidem
-//se coincidirem, avaliamos a prioridade e o aux passa a ser o que tiver a prioridade mais baixa
-//se não coincidirem adiciona-se o aux

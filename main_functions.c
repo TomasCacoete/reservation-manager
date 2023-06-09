@@ -123,7 +123,7 @@ void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
     //guarda-se informação sobre a data
     fprintf(f, "%02d:%02d %02d/%02d/%d\n", d.horas, d.minutos, d.dia, d.mes, d.ano);
     //guarda-se o tamanho da lista das reservas e das pre-reservas
-    fprintf(f, "%d %d %d %d\n", tamanho_lista(l1), tamanho_lista(l2), l1->q_priority, l2->q_priority);
+    fprintf(f, "%d %d\n", tamanho_lista(l1), tamanho_lista(l2));
     //guarda-se a informação de cada reserva e pre-reserva
     for(no *atual = l1->inicio; atual!=NULL; atual=atual->prox){
         fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
@@ -160,7 +160,7 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
     fscanf(f, "%02d:%02d %02d/%02d/%d\n", &(d->horas), &(d->minutos), &(d->dia), &(d->mes), &(d->ano));
     //carrega-se a informação das linhas em que começam e acabam as pre-reservas
     int start, end;
-    fscanf(f, "%d %d %d %d", &start, &end, &(l1->q_priority), &(l2->q_priority));
+    fscanf(f, "%d %d", &start, &end);
     start++;
     end += start;
     //percorre-se as linhas do ficheiro, se o indice da linha for menor que o tamanho da l1 então adiciona-se às reservas, caso contrário adiciona-se às pré-reservas
