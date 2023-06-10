@@ -1,4 +1,16 @@
-#include "lista.h"
+#include "../include/date.h"
+
+void getCurrentTime(Data* d){
+    time_t currentTime;
+    struct tm* localTime;
+    currentTime = time(NULL);
+    localTime = localtime(&currentTime);
+    d->ano = localTime->tm_year + 1900;
+    d->mes = localTime->tm_mon + 1;
+    d->dia = localTime->tm_mday;
+    d->horas = localTime->tm_hour;
+    d->minutos = localTime->tm_min;
+}
 
 int compare_date(Data d1, Data d2){
     if (d1.ano > d2.ano) return 1;
@@ -14,7 +26,7 @@ int compare_date(Data d1, Data d2){
     else return -1;
 }
 //intervalos iguais se as datas iniciais e finais forem iguais
-int intervalo_igual(Intervalo i1, Intervalo i2){
+int checkTimeIntervalEquality(Intervalo i1, Intervalo i2){
     return compare_date(i1.h_inicial,i2.h_inicial) == -1 && compare_date(i1.h_final,i2.h_final) == -1;
 }
 //função utilizada para calcular a hora final com base no serviço
@@ -49,11 +61,4 @@ int data_in_intervalo(Intervalo quer_entrar, Intervalo ja_feito){
                                   || compare_date(quer_entrar.h_inicial, soma_data(ja_feito.h_inicial,1)) == -1;
     else return compare_date(quer_entrar.h_final, ja_feito.h_final) == -1
              || compare_date(quer_entrar.h_inicial, ja_feito.h_inicial) == -1;
-}
-
-int data_in_lista(lista* l, Intervalo i){
-    for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
-        if(data_in_intervalo(i,atual->valor) || intervalo_igual(i,atual->valor)) return 1;
-    }
-    return 0;
 }

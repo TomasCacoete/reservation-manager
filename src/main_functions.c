@@ -1,4 +1,5 @@
-#include "lista.h"
+#include "../include/main.h"
+#include "../include/security.h"
 
 void printAllReservations(lista* l1, lista* l2){
     printf("---------------------------------------------------\n");
@@ -16,14 +17,14 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
     printf("Dia:(DD/MM/AAAA) ");
     diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
     printf("Horas:(HH:MM) ");
-    horaValida(&interv.h_inicial.horas, &interv.h_inicial.minutos);
+    validHour(&interv.h_inicial.horas, &interv.h_inicial.minutos, interv.serviço);
     //verificamos se a data introduzida para a reserva é maior que a atual
     while(compare_date(data_atual,interv.h_inicial) == 1){
         printf("Não podes fazer uma reserva para o passado :)\n");
         printf("Dia:(DD/MM/AAAA) ");
         diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
         printf("Horas:(HH:MM) ");
-        horaValida(&interv.h_inicial.horas, &interv.h_inicial.minutos);
+        validHour(&interv.h_inicial.horas, &interv.h_inicial.minutos, interv.serviço);
     }
     //calcula-se a data final com base na data inicial e no serviço
     interv.h_final = soma_data(interv.h_inicial,interv.serviço);
@@ -46,19 +47,19 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
 void cancela_reserva(lista* l1, lista* l2){
     //pede-se informação ao cliente sobre a reserva para cancelar
     Intervalo cancela;
+    printf("Qual era o serviço?: 1-Lavagem 2-Manutencao ");
+    inputUmDigito(&cancela.serviço, '1', '2');
     printf("Dia da reserva para cancelar:(DD/MM/AAAA) ");
     diaValido(&cancela.h_inicial.dia, &cancela.h_inicial.mes, &cancela.h_inicial.ano);
     printf("A que horas era a reserva:(HH:MM) ");
-    horaValida(&cancela.h_inicial.horas, &cancela.h_inicial.minutos);
-    printf("Qual era o serviço?: 1-Lavagem 2-Manutencao ");
-    inputUmDigito(&cancela.serviço, '1', '2');
+    validHour(&cancela.h_inicial.horas, &cancela.h_inicial.minutos, cancela.serviço);
     printf("Número de CC: ");
     ccValido(&cancela.cc);
     cancela.h_final = soma_data(cancela.h_inicial,cancela.serviço);
     //procura-se na lista das reservas se há alguma com a informação igual
     for(no *atual = l1->inicio; atual!=NULL; atual=atual->prox){
         //se encontrarmos retira-se e insere-se as pre-reservas que fiquem com disponibilidade
-        if(intervalo_igual(atual->valor,cancela) && atual->valor.cc == cancela.cc){
+        if(checkTimeIntervalEquality(atual->valor,cancela) && atual->valor.cc == cancela.cc){
             retira_intervalo(l1,cancela);
             if(l2->inicio != NULL) passa_preReservas_livres(l1,l2);
             printAllReservations(l1,l2);
@@ -67,7 +68,7 @@ void cancela_reserva(lista* l1, lista* l2){
     }
     //caso não se encontre nas reservas procuramos nas pre-reservas e retiramos de lá
     for(no *atual = l2->inicio; atual!=NULL; atual=atual->prox){
-        if(intervalo_igual(atual->valor,cancela) && atual->valor.cc == cancela.cc){
+        if(checkTimeIntervalEquality(atual->valor,cancela) && atual->valor.cc == cancela.cc){
             retira_intervalo(l2,cancela);
             printAllReservations(l1,l2);
             return;
@@ -197,7 +198,7 @@ void avancar_tempo(lista* l1, lista* l2, Data* d){
         printf("Para que dia pretende avançar?:(DD/MM/AAAA) ");
         diaValido(&(d->dia), &(d->mes), &(d->ano));
         printf("Para que horas pretende avançar?:(HH:MM) ");
-        horaValida(&(d->horas), &(d->minutos));
+        validHour(&(d->horas), &(d->minutos), 1);
         if(compare_date(*d, aux) == 1){
             break;
         } else{

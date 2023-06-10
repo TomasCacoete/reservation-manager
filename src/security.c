@@ -1,4 +1,6 @@
-#include "lista.h"
+#include <stdio.h>
+#include <string.h>
+#include "../include/security.h"
 //função que verifica se o input é um número num certo intervalo
 void inputUmDigito(int* value, char c1, char c2){
     char input[100];
@@ -28,16 +30,10 @@ void ccValido(int* cc){
     sscanf(input,"%d",cc);
 }
 //função que valida o input de horas
-void horaValida(int* horas, int* minutos){
+void validHour(int* horas, int* minutos, int service){
     char input[100];
     do{
         fgets(input, sizeof(input), stdin);
-        //evita que o usuário escreva algo do género ":1430" ou "1430:"
-        if(input[0] == ':' || input[strlen(input)-2] == ':'){
-            printf("Input inválido - Garanta que está a utilizar o formato (HH:MM)\n");
-            continue;
-        }
-
         int flag = 0;
         int n_doispontos = 0;
         for(int i=0; input[i]!='\n'; i++){
@@ -57,9 +53,15 @@ void horaValida(int* horas, int* minutos){
         }
         if(flag) continue;
 
+        //evita que o usuário escreva algo do género ":1430" ou "1430:"
+        if(input[0] == ':' || input[strlen(input)-2] == ':'){
+            printf("Input inválido - Garanta que está a utilizar o formato (HH:MM)\n");
+            continue;
+        }
+
         sscanf(input,"%d:%d",horas,minutos);
         //evita que o usuário tente marcar para uma hora que não coincida com o funcionamento da oficina
-        if((*horas < 8 || *horas >= 18) || (*minutos != 30 && *minutos != 0)){
+        if((*horas < 8 || *horas >= 18) || (*minutos != 30 && *minutos != 0) || (service == 2 && *horas == 17 && *minutos == 30)){
             printf("Input inválido - O horário de funcionamento é das 08:00 às 18:00\n");
             continue;
         } else{
@@ -96,7 +98,7 @@ void diaValido(int* dia, int* mes, int* ano){
                 break;
             }
         }
-        if(n_barra != 2){
+        if(flag != 1 && n_barra != 2){
             printf("Input inválido - Garanta que está a utilizar o formato (DD/MM/AAAA)\n");
             flag = 1;
         }

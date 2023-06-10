@@ -1,4 +1,5 @@
-#include "lista.h"
+#include "../include/main.h"
+#include "../include/security.h"
 
 int main(){
     //criamos a lista1 onde vao estar todas as reservas e a lista2 onde irão estar todas as pré-reservas
@@ -9,7 +10,8 @@ int main(){
         return 1;
     }
     //estabecemos a hora atual
-    Data dia_hora_atual  = {2023,5,22,8,0};
+    Data dia_hora_atual;
+    getCurrentTime(&dia_hora_atual);
     //menu com um switch que possui cada opção do programa
     int option = -1;
     while(option != 8){
@@ -47,11 +49,13 @@ int main(){
     destroi_lista(l2);
     return 0;
 }
+/*
+gcc *.c -o main -g
+valgrind --track-origins=yes ./main
 
-//gcc *.c -o main -g
-//valgrind --track-origins=yes ./main
+problemas:
 
-
-//problemas
-
-//dá para fazer uma manutenção para as 17:30
+todo list:
+    implementar base de dados
+    implementar utilização pela internet
+*/
