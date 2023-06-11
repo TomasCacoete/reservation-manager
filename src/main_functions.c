@@ -15,17 +15,9 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
     inputUmDigito(&interv.serviço, '1', '2');
     //pede-se a data inicial do serviço
     printf("Dia:(DD/MM/AAAA) ");
-    diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
+    diaValido(&interv.h_inicial,data_atual);
     printf("Horas:(HH:MM) ");
-    validHour(&interv.h_inicial.horas, &interv.h_inicial.minutos, interv.serviço);
-    //verificamos se a data introduzida para a reserva é maior que a atual
-    while(compare_date(data_atual,interv.h_inicial) == 1){
-        printf("Não podes fazer uma reserva para o passado :)\n");
-        printf("Dia:(DD/MM/AAAA) ");
-        diaValido(&interv.h_inicial.dia,&interv.h_inicial.mes,&interv.h_inicial.ano);
-        printf("Horas:(HH:MM) ");
-        validHour(&interv.h_inicial.horas, &interv.h_inicial.minutos, interv.serviço);
-    }
+    validHour(&interv.h_inicial,interv.serviço, data_atual);
     //calcula-se a data final com base na data inicial e no serviço
     interv.h_final = soma_data(interv.h_inicial,interv.serviço);
     //pede-se o número do cc
@@ -34,25 +26,22 @@ void cria_reserva(lista* l1, lista* l2, Data data_atual){
     //verifica-se a disponibilidade consoante a data que o cliente inseriu
     int disponibilidade = data_in_lista(l1, interv);
     if(disponibilidade == 0){
-        //caso haja, encontra-se um id único e insere-se na lista das reservas
         insere_lista(l1,interv);
-    }
-    else{
-        //caso não haja então assume-se o id da reserva que está a interferir e coloca-se na lista das pre-reservas
+    } else{
         insere_lista(l2,interv);
     }
     printAllReservations(l1,l2);
 }
 
-void cancela_reserva(lista* l1, lista* l2){
+void cancela_reserva(lista* l1, lista* l2, Data data_atual){
     //pede-se informação ao cliente sobre a reserva para cancelar
     Intervalo cancela;
     printf("Qual era o serviço?: 1-Lavagem 2-Manutencao ");
     inputUmDigito(&cancela.serviço, '1', '2');
     printf("Dia da reserva para cancelar:(DD/MM/AAAA) ");
-    diaValido(&cancela.h_inicial.dia, &cancela.h_inicial.mes, &cancela.h_inicial.ano);
+    diaValido(&cancela.h_inicial,data_atual);
     printf("A que horas era a reserva:(HH:MM) ");
-    validHour(&cancela.h_inicial.horas, &cancela.h_inicial.minutos, cancela.serviço);
+    validHour(&cancela.h_inicial,cancela.serviço,data_atual);
     printf("Número de CC: ");
     ccValido(&cancela.cc);
     cancela.h_final = soma_data(cancela.h_inicial,cancela.serviço);
@@ -116,7 +105,7 @@ void imprime_reservas_cliente(lista* l1, lista* l2){
 
 void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
     //abre-se o ficheiro
-    FILE* f = fopen("reservas_info.txt", "w");
+    FILE* f = fopen("../data/reservas_info.txt", "w");
     if(f == NULL){
         perror("Erro ao abrir o ficheiro");
         return;
@@ -127,20 +116,25 @@ void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
     fprintf(f, "%d %d\n", tamanho_lista(l1), tamanho_lista(l2));
     //guarda-se a informação de cada reserva e pre-reserva
     for(no *atual = l1->inicio; atual!=NULL; atual=atual->prox){
-        fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
+        fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
                                                                  atual->valor.h_inicial.horas, atual->valor.h_inicial.minutos, atual->valor.h_final.horas, atual->valor.h_final.minutos,
-                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.priority);
+                                                                 atual->valor.serviço, atual->valor.cc);
     }
     for(no *atual = l2->inicio; atual!=NULL; atual=atual->prox){
-        fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
+        fprintf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d\n",atual->valor.h_inicial.dia,atual->valor.h_inicial.mes,atual->valor.h_inicial.ano,
                                                                  atual->valor.h_inicial.horas, atual->valor.h_inicial.minutos, atual->valor.h_final.horas, atual->valor.h_final.minutos,
-                                                                 atual->valor.serviço, atual->valor.cc, atual->valor.priority);
+                                                                 atual->valor.serviço, atual->valor.cc);
     }
     fclose(f);
     printAllReservations(l1,l2);
 }
 
 void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
+    FILE* f = fopen("../data/reservas_info.txt", "r");
+    if(f == NULL){
+        perror("Erro ao abrir o ficheiro");
+        return;
+    }
     //limpa-se as listas de reservas e pre-reservas pois ao carregar do ficheiro não queremos guardar informação anterior
     while(l1->inicio != NULL){
         no *aux1 = l1->inicio;
@@ -151,11 +145,6 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
         no *aux2 = l2->inicio;
         l2->inicio = l2->inicio->prox;
         free(aux2);
-    }
-    FILE* f = fopen("reservas_info.txt", "r");
-    if(f == NULL){
-        perror("Erro ao abrir o ficheiro");
-        return;
     }
     //carrega-se a informação sobre a data
     fscanf(f, "%02d:%02d %02d/%02d/%d\n", &(d->horas), &(d->minutos), &(d->dia), &(d->mes), &(d->ano));
@@ -168,19 +157,19 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
     for(int i=1; i<end; i++){
         Intervalo interv = {0};
         if(i<start){
-            fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
+            fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
                                                                    &interv.h_inicial.horas, &interv.h_inicial.minutos,
                                                                    &interv.h_final.horas, &interv.h_final.minutos,
-                                                                   &interv.serviço, &interv.cc, &interv.priority);
+                                                                   &interv.serviço, &interv.cc);
             interv.h_final.ano = interv.h_inicial.ano;
             interv.h_final.mes = interv.h_inicial.mes;
             interv.h_final.dia = interv.h_inicial.dia;
             insere_lista(l1, interv);
         } else{
-            fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
+            fscanf(f, "%02d/%02d/%d %02d:%02d-%02d:%02d %d %08d", &interv.h_inicial.dia, &interv.h_inicial.mes, &interv.h_inicial.ano,
                                                                    &interv.h_inicial.horas, &interv.h_inicial.minutos,
                                                                    &interv.h_final.horas, &interv.h_final.minutos,
-                                                                   &interv.serviço, &interv.cc, &interv.priority);
+                                                                   &interv.serviço, &interv.cc);
             interv.h_final.ano = interv.h_inicial.ano;
             interv.h_final.mes = interv.h_inicial.mes;
             interv.h_final.dia = interv.h_inicial.dia;
@@ -194,17 +183,10 @@ void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
 void avancar_tempo(lista* l1, lista* l2, Data* d){
     Data aux = *d;
     //pede-se a data para a qual avançar garantindo que ela é maior que a atual
-    while(1){
-        printf("Para que dia pretende avançar?:(DD/MM/AAAA) ");
-        diaValido(&(d->dia), &(d->mes), &(d->ano));
-        printf("Para que horas pretende avançar?:(HH:MM) ");
-        validHour(&(d->horas), &(d->minutos), 1);
-        if(compare_date(*d, aux) == 1){
-            break;
-        } else{
-            printf("Não podes avançar para uma data menor que a atual\n");
-        }
-    }
+    printf("Para que dia pretende avançar?:(DD/MM/AAAA) ");
+    diaValido(d,aux);
+    printf("Para que horas pretende avançar?:(HH:MM) ");
+    validHour(d,1,aux);
     //retiramos as reservas e pre-reservas cujas datas tenham expirado, ou seja, os serviços tenham ocorrido
     no* atual = l1->inicio;
     no* proximo;

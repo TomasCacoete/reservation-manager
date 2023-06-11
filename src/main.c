@@ -25,7 +25,7 @@ int main(){
                 cria_reserva(l1,l2,dia_hora_atual);
                 break;
             case 2:
-                cancela_reserva(l1,l2);
+                cancela_reserva(l1,l2,dia_hora_atual);
                 break;
             case 3:
                 imprime_reservas_cliente(l1,l2);
@@ -54,8 +54,10 @@ gcc *.c -o main -g
 valgrind --track-origins=yes ./main
 
 problemas:
+o mesmo utilizador consegue fazer uma reserva para uma hora que ele mesmo já tenha marcado
 
 todo list:
+    dizer ao utilizador as horas disponíveis com base no serviço e dia
     implementar base de dados
     implementar utilização pela internet
 */
