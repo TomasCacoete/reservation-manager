@@ -8,28 +8,36 @@ void printAllReservations(lista* l1, lista* l2){
     printf("---------------------------------------------------\n");
 }
 
-void cria_reserva(lista* l1, lista* l2, Data data_atual){
-    Intervalo interv;
+void cria_reserva(lista* l1, lista* l2, Data current_date){
+    Intervalo new_reservation;
     //pede-se o tipo de serviço(lavagem/manutenção)
     printf("Escolha um serviço: 1-Lavagem(meia hora) 2-Manutencao(uma hora) ");
-    inputUmDigito(&interv.serviço, '1', '2');
+    inputUmDigito(&new_reservation.serviço, '1', '2');
     //pede-se a data inicial do serviço
     printf("Dia:(DD/MM/AAAA) ");
-    diaValido(&interv.h_inicial,data_atual);
+    diaValido(&new_reservation.h_inicial,current_date);
+    printAvailableHours(l1,new_reservation.h_inicial,new_reservation.serviço);
     printf("Horas:(HH:MM) ");
-    validHour(&interv.h_inicial,interv.serviço, data_atual);
+    validHour(&new_reservation.h_inicial,new_reservation.serviço,current_date);
     //calcula-se a data final com base na data inicial e no serviço
-    interv.h_final = soma_data(interv.h_inicial,interv.serviço);
+    new_reservation.h_final = soma_data(new_reservation.h_inicial,new_reservation.serviço);
     //pede-se o número do cc
     printf("Número de Cartão de Cidadão: ");
-    ccValido(&interv.cc);
+    ccValido(&new_reservation.cc);
     //verifica-se a disponibilidade consoante a data que o cliente inseriu
-    int disponibilidade = data_in_lista(l1, interv);
-    if(disponibilidade == 0){
-        insere_lista(l1,interv);
-    } else{
-        insere_lista(l2,interv);
+    int disponibilidade = data_in_lista(l1, new_reservation);
+    switch(disponibilidade){
+        case -1:
+            printf("Erro - O próprio cliente já tem uma reserva para esta data\n");
+            break;
+        case 0:
+            insere_lista(l1,new_reservation);
+            break;
+        case 1:
+            insere_lista(l2,new_reservation);
+            break;
     }
+        
     printAllReservations(l1,l2);
 }
 

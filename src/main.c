@@ -11,10 +11,10 @@ int main(){
     }
     //estabecemos a hora atual
     Data dia_hora_atual;
-    getCurrentTime(&dia_hora_atual);
     //menu com um switch que possui cada opção do programa
     int option = -1;
     while(option != 8){
+        getCurrentTime(&dia_hora_atual);
         printf("Menu - Data Atual: %02d:%02d %02d/%02d/%d\n", dia_hora_atual.horas, dia_hora_atual.minutos, dia_hora_atual.dia, dia_hora_atual.mes, dia_hora_atual.ano);
         printf("[1]-Criar uma nova reserva\n[2]-Cancelar uma reserva\n[3]-Mostrar reservas do cliente\n[4]-Mostrar todas as reservas\n[5]-Guardar informação atual no ficheiro\n[6]-Carregar informação do ficheiro\n[7]-Avançar tempo\n[8]-Sair\n");
         printf("Selecione uma opção: ");
@@ -54,10 +54,9 @@ gcc *.c -o main -g
 valgrind --track-origins=yes ./main
 
 problemas:
-o mesmo utilizador consegue fazer uma reserva para uma hora que ele mesmo já tenha marcado
 
-todo list:
-    dizer ao utilizador as horas disponíveis com base no serviço e dia
+
+novas features:
     implementar base de dados
     implementar utilização pela internet
 */

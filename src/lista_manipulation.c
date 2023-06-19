@@ -108,6 +108,7 @@ void imprime_lista(lista *l){
 
 int data_in_lista(lista* l, Intervalo i){
     for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
+        if((data_in_intervalo(i,atual->valor) || checkTimeIntervalEquality(i,atual->valor)) && i.serviço == atual->valor.serviço) return -1;
         if(data_in_intervalo(i,atual->valor) || checkTimeIntervalEquality(i,atual->valor)) return 1;
     }
     return 0;
@@ -136,4 +137,50 @@ void passa_preReservas_livres(lista* l1,lista* l2){
     }
     retira_intervalo(l2,sub);
     insere_lista(l1,sub);
+}
+
+void printAvailableHours(lista* l, Data chosen_day, int chosen_service){
+    if(l->inicio == NULL) return;
+    int NUMBER_OF_AVAILABLE_HOURS;
+    if(chosen_service == 1) NUMBER_OF_AVAILABLE_HOURS = 20;
+    else NUMBER_OF_AVAILABLE_HOURS = 19;
+    int hours[][2] = {{8,0},{8,30},{9,0},{9,30},{10,0},{10,30},{11,0},{11,30},{12,0},{12,30},{13,0},{13,30},{14,0},{14,30},{15,0},{15,30},{16,0},{16,30},{17,0},{17,30}};
+    no* start = l->inicio;
+
+    while(chosen_day.ano != start->valor.h_inicial.ano && chosen_day.mes != start->valor.h_inicial.mes && chosen_day.dia != start->valor.h_inicial.dia)
+        start = start->prox;
+    
+    int** available_hours = NULL;
+    int size = 0;
+    int i=0;
+    while(i<NUMBER_OF_AVAILABLE_HOURS){
+        no* atual = start;
+        int is_occupied = 0;
+        while(atual != NULL && chosen_day.ano == atual->valor.h_inicial.ano && chosen_day.mes == atual->valor.h_inicial.mes && chosen_day.dia == atual->valor.h_inicial.dia){
+            if(hours[i][0] == atual->valor.h_inicial.horas && hours[i][1] == atual->valor.h_inicial.minutos && atual->valor.serviço == 2){
+                is_occupied = 2;
+                i++;
+                break;
+            } else if(hours[i][0] == atual->valor.h_inicial.horas && hours[i][1] == atual->valor.h_inicial.minutos){
+                is_occupied = 1;
+                break;
+            }
+            atual = atual->prox;
+        }
+        if(is_occupied == 0){
+            size++;
+            available_hours = (int**)realloc(available_hours, sizeof(int*)*size);
+            available_hours[size-1] = (int*)malloc(sizeof(int) * 2);
+            available_hours[size-1][0] = hours[i][0];
+            available_hours[size-1][1] = hours[i][1];
+        }
+        i++;
+    }
+
+    for(int i=0; i<size; i++){
+        printf("%d:%d ",available_hours[i][0],available_hours[i][1]);
+        free(available_hours[i]);
+    }
+    printf("\n");
+    free(available_hours);
 }
