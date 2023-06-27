@@ -1,6 +1,6 @@
 #include "../include/lista.h"
 
-lista* cria_lista(){
+lista* initialize_list(){
     lista* l = malloc(sizeof(lista));
     if(l != NULL){
         l->inicio = NULL;
@@ -76,7 +76,7 @@ void retira_intervalo(lista *l, Intervalo interv){
     }
 }
 
-void destroi_lista(lista *l){
+void free_list_memory(lista *l){
     while(l->inicio != NULL){
         no *aux = l->inicio;
         l->inicio = l->inicio->prox;
@@ -108,7 +108,7 @@ void imprime_lista(lista *l){
 
 int data_in_lista(lista* l, Intervalo i){
     for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
-        if((data_in_intervalo(i,atual->valor) || checkTimeIntervalEquality(i,atual->valor)) && i.serviço == atual->valor.serviço) return -1;
+        if((data_in_intervalo(i,atual->valor) || checkTimeIntervalEquality(i,atual->valor)) && i.cc == atual->valor.cc) return -1;
         if(data_in_intervalo(i,atual->valor) || checkTimeIntervalEquality(i,atual->valor)) return 1;
     }
     return 0;

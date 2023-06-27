@@ -17,9 +17,9 @@ typedef struct{
     int q_priority;
 } lista;
 
-lista* cria_lista();
+lista* initialize_list();
 no* insere_lista(lista* l, Intervalo interv);
-void destroi_lista(lista *l);
+void free_list_memory(lista *l);
 void imprime_lista(lista *l);
 void retira_intervalo(lista *l,Intervalo interv);
 int tamanho_lista(lista* l);
