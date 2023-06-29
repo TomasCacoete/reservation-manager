@@ -29,6 +29,12 @@ int compare_date(Data d1, Data d2){
 int checkTimeIntervalEquality(Intervalo i1, Intervalo i2){
     return compare_date(i1.h_inicial,i2.h_inicial) == -1 && compare_date(i1.h_final,i2.h_final) == -1;
 }
+
+int compare_interval(Intervalo i1, Intervalo i2){
+    if(compare_date(i1.h_final, i2.h_final) == 1) return 1;
+    else if(compare_date(i1.h_final, i2.h_final) == -1 && (compare_date(i1.h_inicial, i2.h_inicial) == 1 || compare_date(i1.h_inicial, i2.h_inicial) == -1)) return 1;
+    else return 0;
+}
 //função utilizada para calcular a hora final com base no serviço
 Data soma_data(Data d, int service){
     Data final;

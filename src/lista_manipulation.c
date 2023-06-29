@@ -8,8 +8,6 @@ lista* initialize_list(){
     }
     return l;
 }
-//função parecida à que usamos nas aulas que ordena os elementos verificando se o fim de uma reserva é antes do início da que queremos inserir
-//além disso também trabalha com ponteiros que apontam para o elemento anterior
 
 no* insere_lista(lista* l, Intervalo interv) {
     no* aux = malloc(sizeof(no));
@@ -28,10 +26,7 @@ no* insere_lista(lista* l, Intervalo interv) {
     else{
         no* atual = l->inicio;
         while(atual != NULL){
-            if(compare_date(atual->valor.h_inicial, interv.h_inicial) == 1
-            ||(compare_date(atual->valor.h_inicial, interv.h_inicial) == 0 && compare_date(atual->valor.h_final, interv.h_final) == 1)){
-                break;
-            }
+            if(compare_interval(interv, atual->valor) == 0) break;
             atual = atual->prox;
         }
         if(atual == l->inicio){
@@ -55,7 +50,6 @@ no* insere_lista(lista* l, Intervalo interv) {
     return aux;
 }
 
-//função parecida à utilizada nas aulas, única diferença é a atualização dos ponteiros para trás
 void retira_intervalo(lista *l, Intervalo interv){
     no* atual = l->inicio;
     no* ant = NULL;
@@ -84,13 +78,13 @@ void free_list_memory(lista *l){
     }
     free(l);
 }
-//função simples que devolve o tamanho de uma lista
+
 int tamanho_lista(lista* l){
     int tam = 0;
     for(no* atual = l->inicio; atual != NULL; atual = atual->prox) tam++;
     return tam;
 }
-//função simples que imprime a lista
+
 void imprime_lista(lista *l){
     //if (l->inicio!=NULL){
         for(no *atual = l->inicio; atual!=NULL; atual=atual->prox){
@@ -135,8 +129,10 @@ void passa_preReservas_livres(lista* l1,lista* l2){
         }
         atual = atual->prox;
     }
-    retira_intervalo(l2,sub);
-    insere_lista(l1,sub);
+    if(data_in_lista(l1,sub) == 0){
+        retira_intervalo(l2,sub);
+        insere_lista(l1,sub);
+    }
 }
 
 void printAvailableHours(lista* l, Data chosen_day, int chosen_service){

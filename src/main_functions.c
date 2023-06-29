@@ -34,7 +34,10 @@ void cria_reserva(lista* l1, lista* l2, Data current_date){
             insere_lista(l1,new_reservation);
             break;
         case 1:
-            insere_lista(l2,new_reservation);
+            if(data_in_lista(l2, new_reservation) == 0)
+                insere_lista(l2,new_reservation);
+            else
+                printf("Erro - O próprio cliente já tem uma reserva para esta data\n");
             break;
     }
         
@@ -113,7 +116,7 @@ void imprime_reservas_cliente(lista* l1, lista* l2){
 
 void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
     //abre-se o ficheiro
-    FILE* f = fopen("../data/reservas_info.txt", "w");
+    FILE* f = fopen("../../data/reservas_info.txt", "w");
     if(f == NULL){
         perror("Erro ao abrir o ficheiro");
         return;
@@ -138,7 +141,7 @@ void guarda_informacao_ficheiro(lista* l1, lista* l2, Data d){
 }
 
 void carrega_informacao_ficheiro(lista* l1, lista* l2, Data* d){
-    FILE* f = fopen("../data/reservas_info.txt", "r");
+    FILE* f = fopen("../../data/reservas_info.txt", "r");
     if(f == NULL){
         perror("Erro ao abrir o ficheiro");
         return;

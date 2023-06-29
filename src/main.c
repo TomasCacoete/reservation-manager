@@ -50,6 +50,10 @@ int main(){
     return 0;
 }
 /*
+cd build/bin
+wsl
+gcc ../../src/*.c -o main -g
+valgrind --track-origins=yes ./main
 
 problemas:
 

@@ -22,6 +22,7 @@ typedef struct{
 void getCurrentTime(Data* d);
 int checkTimeIntervalEquality(Intervalo I1, Intervalo I2);
 int compare_date(Data d1, Data d2);
+int compare_interval(Intervalo i1, Intervalo i2);
 Data soma_data(Data d, int service);
 int data_in_intervalo(Intervalo quer_entrar, Intervalo ja_feito);
 
